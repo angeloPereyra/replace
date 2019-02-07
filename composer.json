@@ -1,0 +1,13 @@
+{
+    "name": "angelopereyra/replace",
+    "description": "Replace substring using custom identifiers",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Neil Angelo Pereyra",
+            "email": "neilpereyra@outlook.ph"
+        }
+    ],
+    "minimum-stability": "stable"
+}
