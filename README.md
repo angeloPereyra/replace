@@ -6,9 +6,6 @@ From the above example, we can set the value for `{domain}` substring in several
 ```php
 $url->addLookup('domain', 'local');
 
-// setting the property itself
-$url['domain'] = 'local'
-
 // dumping a dictionary
 $url->setLookup([
     'domain' => 'local'
@@ -31,5 +28,14 @@ $url = new Replaceable('https://mysite.UwU domain UwU.com', function($key) {
     return 'UwU ' . $key . ' UwU';
 });
 ```
+A static helper is also exposed for convenience
+```php
+$lookup = [
+    'type'   => 'Bearer',
+    'token'  => 'xoxb-83029aurioDnd'
+];
 
+Replaceable::parse('Authorization: @type @token', $lookup, '@++key++')
+// prints "Authorization: Bearer xoxb-83029aurioDnd"
+```
 > This library is brought to you by: ~~Overkill Solutions Gang and Wheel Reinvention Inc™~~
