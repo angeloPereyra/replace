@@ -1,8 +1,16 @@
+# Installation
+```shell
+> composer require angelopereyra/replace
+```
 # Usage
 ```php
+use Replace\Replaceable;
+
+...
+
 $url = new Replaceable('https://mysite.{domain}.com');
 ```
-From the above example, we can set the value for `{domain}` substring in several ways:
+From the above example, we can set the value for `{domain}` substring in two ways:
 ```php
 $url->addLookup('domain', 'local');
 
