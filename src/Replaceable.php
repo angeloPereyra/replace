@@ -1,5 +1,6 @@
 <?php
 
+namespace Replace;
 /**
  * Replaces readable defined tokens in a string through native str_replace
  * 
@@ -37,11 +38,11 @@ class Replaceable
     protected $keyLookups = [];
 
     /**
-     * Undocumented function
+     * Replaces the token in the string according to the keylookup given
      *
-     * @param [type] $format
-     * @param [type] $keyLookup
-     * @param [type] $tokenFormat
+     * @param string $format Base unformatted string containing the tokens
+     * @param array $keyLookup
+     * @param null|callable|string $tokenFormat Accepts a string or closure. For string token format, the substring ++key++ will be the identifier. On the other hand, the closure will be passed with the $key parameter. The token format has a default definition, if passed a null or not specified, similar to passing this string: "{++key++}"
      * @return void
      */
     public static function parse($format, $keyLookup, $tokenFormat = null)
@@ -55,23 +56,12 @@ class Replaceable
      * Creates a new StringFormat object
      *
      * @param string $format Base unformatted string containing the tokens
-     * @param null|closure|string $tokenFormat Accepts a string or closure. For string token format, the substring ++key++ will be the identifier. On the other hand, the closure will be passed with the $key parameter. The token format has a default definition, if passed a null or not specified, similar to passing this string: "{++key++}"
+     * @param null|callable|string $tokenFormat Accepts a string or closure. For string token format, the substring ++key++ will be the identifier. On the other hand, the closure will be passed with the $key parameter. The token format has a default definition, if passed a null or not specified, similar to passing this string: "{++key++}"
      */
     public function __construct(string $format, $tokenFormat = null)
     {
         $this->base = $format;
         $this->tokenFormat = $tokenFormat;
-    }
-
-    /**
-     * Magic method override
-     *
-     * @param string $key
-     * @param string $value
-     */
-    public function __set($key, $value)
-    {
-        $this->addLookup($key, $value);
     }
     
     /**
@@ -87,7 +77,7 @@ class Replaceable
         }
 
         if (is_callable($this->tokenFormat) === true) {
-            return call_user_func($this->tokenFormat);
+            return call_user_func($this->tokenFormat, $key);
         }
 
         return str_replace('++key++', $key, $this->tokenFormat);
