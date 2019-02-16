@@ -46,4 +46,3 @@ $lookup = [
 Replaceable::parse('Authorization: @type @token', $lookup, '@++key++')
 // prints "Authorization: Bearer xoxb-83029aurioDnd"
 ```
-> This library is brought to you by: ~~Overkill Solutions Gang and Wheel Reinvention Inc™~~
