@@ -5,7 +5,7 @@ namespace Replace;
  * Replaces readable defined tokens in a string through native str_replace
  * 
  * @author Neil Angelo Pereyra <neilpereyra@outlook.ph>
- * @version 0.1.0
+ * @version 1.0.1
  */
 class Replaceable
 {
@@ -43,7 +43,7 @@ class Replaceable
      * @param string $format Base unformatted string containing the tokens
      * @param array $keyLookup
      * @param null|callable|string $tokenFormat Accepts a string or closure. For string token format, the substring ++key++ will be the identifier. On the other hand, the closure will be passed with the $key parameter. The token format has a default definition, if passed a null or not specified, similar to passing this string: "{++key++}"
-     * @return void
+     * @return string
      */
     public static function parse($format, $keyLookup, $tokenFormat = null)
     {
