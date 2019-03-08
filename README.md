@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/angeloPereyra/replace.svg?branch=master)](https://travis-ci.com/angeloPereyra/replace)
+
 # Installation
 ```shell
 > composer require angelopereyra/replace
