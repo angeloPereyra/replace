@@ -150,5 +150,40 @@ class Replaceable
          * FROM: $$++key++$$
          * TO: \B\$\$(\w+)\$\$\B
          */
+
+        //$re = '/\B\$\$(\w+)\$\$\B/m';
+        //$str = '$$wow$$ amazing $$wowamazing$$  ';
+        //
+        //preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0);
+        //
+        //// Print the entire match result
+        //var_dump($matches);
+
+        $tokenFormat = $this->resolveTokenFormat(self::KEY_IDENTIFIER);
+
+        $regex = '';
+
+        $prefixStartIndex = 0;
+        $prefixEndIndex = strpos($tokenFormat, self::KEY_IDENTIFIER);
+        $prefix = substr($tokenFormat, $prefixStartIndex, $prefixEndIndex);
+        $regex .= $this->escapeCharacters($prefix);
+        $regex .= '(\w+)';
+
+        $suffixStartIndex = $prefixEndIndex + (strlen(self::KEY_IDENTIFIER) - 1);
+        $suffixEndIndex = strlen($tokenFormat) - 1;
+        $suffix = substr($tokenFormat, $suffixStartIndex, $suffixEndIndex);
+        $regex .= $this->escapeCharacters($suffix);
+
+        return $regex;
+    }
+
+    private function escapeCharacters($substring)
+    {
+        $result = '';
+        $length = strlen($substring);
+        for ($i = 0; $i < $length; $i++){
+            $result .= '[' . $substring[$i] . ']';
+        }
+        return $result;
     }
 }
