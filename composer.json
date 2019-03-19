@@ -15,9 +15,7 @@
         "psy/psysh": "^0.9.9"
     },
     "autoload": {
-        "classmap": [
-            "src"
-        ]
+        "psr-4": {"Replace\\": "src"}
     },
     "autoload-dev": {
         "classmap": [
