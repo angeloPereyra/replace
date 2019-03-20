@@ -5,17 +5,17 @@ use Replace\Replaceable;
 
 /**
  * Test cases for Replaceable class
- * 
+ *
  * @author Neil Angelo Pereyra <neilpereyra@outlook.ph>
  * @version 0.1.0
  */
 class ReplaceableTest extends TestCase
 {
-    public $testString = 'gitk -p {file_path}';
-
     public $base = [
         'gitk -p {file_path}',
-        '@@php $name = session(\'name\') @@endphp'
+        '@@php $name = session(\'name\') @@endphp',
+        'Hi. I think you are _{adjective}_',
+        '$url = \'$$select_url\';'
     ];
 
     public function testConstructorWorking()
@@ -115,6 +115,89 @@ class ReplaceableTest extends TestCase
                     return '@@' . $key;
                 },
                 '<?php $name = session(\'employee_1\') ?>'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider provideCanIdentifyTokensCorrectly
+     */
+    public function testCanIdentifyTokensCorrectly($dataIndex, $tokenFormat, $wordBoundary, $expected)
+    {
+        $instance = new Replaceable($this->base[$dataIndex], $tokenFormat);
+        $actual = $instance->identifyTokens($wordBoundary);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function provideCanIdentifyTokensCorrectly()
+    {
+        return [
+            [
+                0,
+                null,
+                true,
+                ['file_path']
+            ],
+            [
+                2,
+                null,
+                false,
+                ['adjective']
+            ],
+            [
+                1,
+                '@@' . Replaceable::KEY_IDENTIFIER,
+                true,
+                ['php', 'endphp']
+            ],
+            [
+                3,
+                '$$' . Replaceable::KEY_IDENTIFIER,
+                false,
+                ['select_url']
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider provideCanIdentifyTokensCorrectlyOnMultiline
+     */
+    public function testCanIdentifyTokensCorrectlyOnMultiline($base, $tokenFormat, $wordBoundary, $expected)
+    {
+        $instance = new Replaceable($base, $tokenFormat);
+        $actual = $instance->identifyTokens($wordBoundary);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function provideCanIdentifyTokensCorrectlyOnMultiline()
+    {
+        $data1 = file_get_contents(__DIR__ . '/files/1.txt');
+        $data2 = file_get_contents(__DIR__ . '/files/2.txt');
+
+        return [
+            [
+                $data1,
+                null,
+                true,
+                ['London', 'is', 'down', 'fair', 'lady']
+            ],
+            [
+                $data1,
+                '@' . Replaceable::KEY_IDENTIFIER,
+                false,
+                ['bridge', 'down', 'falling']
+            ],
+            [
+                $data2,
+                '$$' . Replaceable::KEY_IDENTIFIER,
+                true,
+                ['comment']
+            ],
+            [
+                $data2,
+                '$$' . Replaceable::KEY_IDENTIFIER,
+                false,
+                ['comment', 'select_url', 'other_scripts']
             ]
         ];
     }

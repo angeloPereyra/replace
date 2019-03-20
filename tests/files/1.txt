@@ -1,0 +1,7 @@
+London @bridge is
+Falling @down
+@falling down
+
+{London} bridge {is}
+falling {down}
+My {fair} {lady}

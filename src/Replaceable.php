@@ -10,6 +10,9 @@ namespace Replace;
 class Replaceable
 {
 
+    /**
+     * @var string
+     */
     const KEY_IDENTIFIER = '++key++';
 
     /**
@@ -68,6 +71,10 @@ class Replaceable
         $this->tokenFormat = $tokenFormat;
     }
 
+    /**
+     * @param null $defaultKey
+     * @return callable|mixed|null|closure|string
+     */
     private function resolveTokenFormat($defaultKey = null)
     {
         if ($this->tokenFormat === null) {
@@ -144,46 +151,106 @@ class Replaceable
         return $result;
     }
 
-    public function getTokens($boundary = true)
+    /**
+     * Returns an array that contains the identified tokens on the base string
+     *
+     * @param bool $wordBoundary
+     * @return array
+     */
+    public function identifyTokens($wordBoundary = true)
     {
-        /**
-         * FROM: $$++key++$$
-         * TO: \B\$\$(\w+)\$\$\B
-         */
-
-        //$re = '/\B\$\$(\w+)\$\$\B/m';
-        //$str = '$$wow$$ amazing $$wowamazing$$  ';
-        //
-        //preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0);
-        //
-        //// Print the entire match result
-        //var_dump($matches);
-
+        // get the resolved token format
         $tokenFormat = $this->resolveTokenFormat(self::KEY_IDENTIFIER);
 
-        $regex = '';
+        // get regex for identifying tokens
+        $regex = $this->getTokenFormatRegex($tokenFormat, self::KEY_IDENTIFIER, $wordBoundary);
 
-        $prefixStartIndex = 0;
-        $prefixEndIndex = strpos($tokenFormat, self::KEY_IDENTIFIER);
-        $prefix = substr($tokenFormat, $prefixStartIndex, $prefixEndIndex);
-        $regex .= $this->escapeCharacters($prefix);
-        $regex .= '(\w+)';
+        // identify tokens using preg_match_all
+        $matches = [];
+        preg_match_all($regex, $this->base, $matches, PREG_SET_ORDER, 0);
 
-        $suffixStartIndex = $prefixEndIndex + (strlen(self::KEY_IDENTIFIER) - 1);
-        $suffixEndIndex = strlen($tokenFormat) - 1;
-        $suffix = substr($tokenFormat, $suffixStartIndex, $suffixEndIndex);
-        $regex .= $this->escapeCharacters($suffix);
-
-        return $regex;
+        // get the token from the preg_match result and return result as a flat array
+        $result = [];
+        foreach ($matches as $match) {
+            $result[] = $match[2];
+        }
+        return $result;
     }
 
-    private function escapeCharacters($substring)
+    /**
+     * Returns the regex for the tokenFormat set by user
+     *
+     * @param $tokenFormat
+     * @param $keyIdentifier
+     * @param $boundary
+     * @return string
+     */
+    private function getTokenFormatRegex($tokenFormat, $keyIdentifier, $boundary)
+    {
+        // create empty result variable
+        $regex = '';
+
+        // identify the prefix and append the resulting group capture regex
+        $prefixStartIndex = 0;
+        $prefixEndIndex = strpos($tokenFormat, $keyIdentifier);
+        $prefix = substr($tokenFormat, $prefixStartIndex, $prefixEndIndex);
+        $regex .= $this->applyGroupCapture($prefix);
+
+        // append group capture for the key identifier itself
+        $regex .= '(\w+)';
+
+        //identify the suffix and append the resulting group capture regex
+        $identifierLength = strlen($keyIdentifier);
+        $suffixStartIndex = $prefixEndIndex + $identifierLength;
+        $suffixEndIndex = strlen($tokenFormat) - 1;
+        $suffix = substr($tokenFormat, $suffixStartIndex, $suffixEndIndex);
+        $regex .= $this->applyGroupCapture($suffix);
+
+        // apply word boundary regex depending on the option set by user
+        if ($boundary === true) {
+            $regex = $this->applyBoundary($regex);
+        }
+
+        //finally, apply delimiter so that the regex can be used with preg_match_all function
+        return $this->applyDelimiter($regex);
+    }
+
+    /**
+     * Applies group capture regex code to a substring
+     *
+     * @param $substring
+     * @return string
+     */
+    private function applyGroupCapture($substring)
     {
         $result = '';
         $length = strlen($substring);
-        for ($i = 0; $i < $length; $i++){
+        for ($i = 0; $i < $length; $i++) {
             $result .= '[' . $substring[$i] . ']';
         }
-        return $result;
+        return '(' . $result . ')';
+    }
+
+    /**
+     * Applies word boundary to the regex
+     *
+     * @param $regex
+     * @return string
+     */
+    private function applyBoundary($regex)
+    {
+        return '(?<=\s|^)' . $regex . '(?=\s|$)';
+    }
+
+    /**
+     * Applies delimeter to a regex
+     *
+     * @param $regex
+     * @return string
+     */
+    private function applyDelimiter($regex)
+    {
+        $delimeter = ';';
+        return $delimeter . $regex . $delimeter;
     }
 }

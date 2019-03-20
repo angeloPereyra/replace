@@ -1,0 +1,5 @@
+// $$comment
+var url = '$$select_url';
+console.log(url);
+
+alert('test');$$other_scripts;
