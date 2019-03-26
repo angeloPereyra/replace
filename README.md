@@ -48,3 +48,26 @@ $lookup = [
 Replaceable::parse('Authorization: @type @token', $lookup, '@++key++')
 // prints "Authorization: Bearer xoxb-83029aurioDnd"
 ```
+
+## Identify tokens
+Suppose you have the subject string below:
+```text
+Hello, {name}. You look {adjective} today. 
+```
+Replaceable can identify the tokens according to the given token format. In this case, we will be using the default format which is `{++key++}`.
+
+
+We can identify the tokens using the following usage:
+```php
+$subject = file_get_contents('...');
+
+$sentence = new Replaceable($subject);
+
+$sentence->identifyTokens(false);
+// returns ['name', 'adjective']
+```
+To identify tokens with respect to word boundary, set the 1st parameter to true:
+```php
+$sentence->identifyTokens(true);
+// returns ['adjective']
+```
